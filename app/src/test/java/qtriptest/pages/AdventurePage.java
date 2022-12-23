@@ -1,5 +1,6 @@
 package qtriptest.pages;
 
+import qtriptest.WrapperClass;
 import java.util.ArrayList;
 import java.util.List;
 import org.openqa.selenium.WebDriver;
@@ -20,7 +21,6 @@ public class AdventurePage {
     // WebElement searchbar;
     // @FindBy(id = "autocomplete")
     // WebElement searchbar;
-
     // @FindBy(id = "results")
     // WebElement noCityFound;
     Select sel;
@@ -58,6 +58,8 @@ public class AdventurePage {
     @FindBy(xpath = "//div[@class = 'activity-card']")
     WebElement selectTheAdventure;
 
+    WrapperClass wrap = new WrapperClass();
+
     public AdventurePage(RemoteWebDriver driver) {
         this.driver = driver;
         PageFactory.initElements(driver, this);
@@ -91,15 +93,18 @@ public class AdventurePage {
 
     public void clearCategory() {
         for (int i = 0; i < clearElements.size(); i++) {
-            clearElements.get(i).click();
+            // clearElements.get(i).click();
+            wrap.click(clearElements.get(i), driver);
         }
     }
 
     public void selectAdventure(String adventure) {
         try {
-            searchAdventure.sendKeys(adventure);
+            // searchAdventure.sendKeys(adventure);
+            wrap.sendKeys(searchAdventure, adventure);
             Thread.sleep(3000);
-            selectTheAdventure.click();
+            // selectTheAdventure.click();
+            wrap.click(selectTheAdventure, driver);
         } catch (Exception e) {
             System.out.println("exception while searching and selecting adventure");
         }

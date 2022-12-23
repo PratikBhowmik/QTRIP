@@ -2,12 +2,18 @@ package qtriptest.tests;
 
 import qtriptest.DP;
 import qtriptest.DriverSingleton;
+import qtriptest.ReportSingleton;
 import qtriptest.pages.HomePage;
 import qtriptest.pages.LoginPage;
 import qtriptest.pages.RegisterPage;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -25,6 +31,8 @@ import com.relevantcodes.extentreports.LogStatus;
 public class testCase_01 {
 
     RemoteWebDriver driver;
+    ExtentReports report;
+    ExtentTest test;
     // HomePage home = new HomePage(driver);
 
     public static String lastgeneratedUsername;
@@ -36,12 +44,21 @@ public class testCase_01 {
 
         DriverSingleton ds = DriverSingleton.getInstance();
         driver = ds.getDriver();
+        ReportSingleton reportObj = ReportSingleton.getInstance();
+        report = reportObj.getReport();
+        test = report.startTest("Test case 1 ");
         // driver.get("https://qtripdynamic-qa-frontend.vercel.app/");
+        // System.out.println(System.getProperty("user.dir"));
+        report.loadConfig(new File(System.getProperty("user.dir")
+                + "/src/test/java/qtriptest/extentReportConfig.xml"));
+        // report.loadConfig(System.getProperty("user.dir"))+"/src/test/java/qtriptest/extentReportConfig.xml";
 
     }
 
-    @Test(dataProvider = "my data provider", dataProviderClass = DP.class, priority = 1, groups = {"Login flow"})
-    public void TestCase01(Object username, Object password) throws InterruptedException {
+    @Test(dataProvider = "my data provider", dataProviderClass = DP.class, priority = 1,
+            groups = {"Login flow"})
+    public void TestCase01(Object username, Object password)
+            throws InterruptedException, IOException {
 
         // ExtentReports er = new ExtentReports("filePath", true);
 
@@ -77,6 +94,7 @@ public class testCase_01 {
         LoginPage login = new LoginPage(driver);
         Thread.sleep(3000);
         Assert.assertTrue(login.verifyusernavigatedtologinPage());
+
         // Enter username password and click on login button
         lastgeneratedUsername = register.lastgeneratedUsername;
         try {
@@ -94,15 +112,34 @@ public class testCase_01 {
         home.clickOnLogout();
         // Verify user is logged out
         Assert.assertTrue(home.ishomepageDisplayed());
+
+        boolean status = home.ishomepageDisplayed();
+        if (status) {
+            test.log(LogStatus.PASS, "Registration and login test passed for all datas");
+        } else {
+            test.log(LogStatus.FAIL, "Registration and login test failed");
+            test.log(LogStatus.FAIL, test.addScreenCapture(capture(driver)) + "Test failed");
+        }
         // home.clickOnRegisterPage();
         // register.registrationOfNewUser();
         // login.loginToQtrip();
+    }
 
+
+    public String capture(WebDriver driver) throws IOException {
+        File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        File dest = new File(System.getProperty("user.dir") + "/src/test/java/QtripFailedSS/"
+                + System.currentTimeMillis() + ".png");
+        String errflpath = dest.getAbsolutePath();
+        FileUtils.copyFile(scrFile, dest);
+        return errflpath;
     }
 
     @AfterSuite
     public void tearDown() {
         driver.quit();
+        report.endTest(test);
+        report.flush();
         // driver = null;
     }
 }

@@ -1,5 +1,6 @@
 package qtriptest.pages;
 
+import qtriptest.WrapperClass;
 import java.util.ArrayList;
 import java.util.List;
 import org.openqa.selenium.By;
@@ -24,6 +25,8 @@ public class HistoryPage {
     @FindBy(tagName = "table")
     WebElement webtable;
 
+    WrapperClass wrap = new WrapperClass();
+
     public HistoryPage(RemoteWebDriver driver) {
         this.driver = driver;
         PageFactory.initElements(driver, this);
@@ -33,7 +36,8 @@ public class HistoryPage {
         List<WebElement> cancelBtns = driver.findElements(By.xpath("//table//button"));
 
         for (int i = 0; i < cancelBtns.size(); i++) {
-            cancelBtn.click();
+            // cancelBtn.click();
+            wrap.click(cancelBtn, driver);
         }
     }
 
@@ -48,7 +52,8 @@ public class HistoryPage {
     }
 
     public void clickOnReservation() {
-        reservations.click();
+        // reservations.click();
+        wrap.click(reservations, driver);
     }
 
     public void refreshPage() {

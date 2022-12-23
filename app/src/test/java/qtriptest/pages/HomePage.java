@@ -1,11 +1,11 @@
 package qtriptest.pages;
 
+import qtriptest.WrapperClass;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -32,6 +32,8 @@ public class HomePage {
     @FindBy(xpath = "//h5[text()='No City found']")
     WebElement noCityfound;
 
+    WrapperClass wrap = new WrapperClass();
+
 
     // public void navigateToHomePage() {
     // // if (!driver.getCurrentUrl().equals(this.url)) {
@@ -46,20 +48,23 @@ public class HomePage {
     }
 
     public void navigateToHomePage() {
-        if (!driver.getCurrentUrl().equals(this.homepageurl)) {
-            driver.get(this.homepageurl);
-        }
+        // if (!driver.getCurrentUrl().equals(this.homepageurl)) {
+        // driver.get(this.homepageurl);
+        // }
         // driver.get("https://qtripdynamic-qa-frontend.vercel.app/");
+        wrap.get(driver, homepageurl);
     }
 
     public void clickOnRegisterPage() {
         WebDriverWait wait = new WebDriverWait(driver, 30);
         wait.until(ExpectedConditions.visibilityOf(registerButton));
-        registerButton.click();
+        // registerButton.click();
+        wrap.click(registerButton, driver);
     }
 
     public void clickOnLogout() {
-        logoutBtn.click();
+        // logoutBtn.click();
+        wrap.click(logoutBtn, driver);
     }
 
     public boolean ishomepageDisplayed() {
@@ -71,9 +76,10 @@ public class HomePage {
         // try {
         // WebDriverWait wait = new WebDriverWait(driver, 30);
         // wait.until(ExpectedConditions.visibilityOf(searchbar));
-        searchbar.clear();
+        // searchbar.clear();
         // wait.until(ExpectedConditions.visibilityOf(searchbar));
-        searchbar.sendKeys(city);
+        // searchbar.sendKeys(city);
+        wrap.sendKeys(searchbar, city);
         Thread.sleep(3000);
         // } catch (Exception e) {
         // System.out.println(e.getMessage());

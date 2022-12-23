@@ -1,8 +1,10 @@
 package qtriptest.pages;
 
 import qtriptest.DriverSingleton;
+import qtriptest.WrapperClass;
 import java.sql.Timestamp;
 import java.util.concurrent.TimeUnit;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -35,6 +37,8 @@ public class RegisterPage {
     @FindBy(xpath = "//button[@type = 'submit']")
     WebElement registerButton;
 
+    WrapperClass wrap = new WrapperClass();
+
     public RegisterPage(RemoteWebDriver driver) {
         this.driver = driver;
         PageFactory.initElements(driver, this);
@@ -53,22 +57,25 @@ public class RegisterPage {
         else
             test_data_username = username;
 
-        emailField.sendKeys(test_data_username);
-        passwordField.sendKeys(password);
-        confirmpasswordField.sendKeys(confirmPassword);
+        // emailField.sendKeys(test_data_username);
+        wrap.sendKeys(emailField, test_data_username);
+        // passwordField.sendKeys(password);
+        wrap.sendKeys(passwordField, password);
+        // confirmpasswordField.sendKeys(confirmPassword);
+        wrap.sendKeys(confirmpasswordField, confirmPassword);
         this.lastgeneratedUsername = test_data_username;
     }
 
     public void clickregisternowButton() {
         // WebDriverWait wait = new WebDriverWait(driver, 30);
         // wait.until(ExpectedConditions.visibilityOf(registerButton));
-        registerButton.click();
+        // registerButton.click();
+        wrap.click(registerButton, driver);
     }
 
     public boolean isregisTrationpagedisplayed() {
         return driver.getCurrentUrl().equalsIgnoreCase(registerpageUrl);
     }
-
     // public boolean regsiterUser(String name, String password, String confirmPassword, String
     // generateRandomUsername) {
     // }

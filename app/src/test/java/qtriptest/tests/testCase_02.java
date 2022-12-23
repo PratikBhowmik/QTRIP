@@ -2,9 +2,19 @@ package qtriptest.tests;
 
 import qtriptest.DP;
 import qtriptest.DriverSingleton;
+import qtriptest.ReportSingleton;
 import qtriptest.pages.AdventurePage;
 import qtriptest.pages.HomePage;
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import com.relevantcodes.extentreports.ExtentReports;
+import com.relevantcodes.extentreports.ExtentTest;
+import com.relevantcodes.extentreports.LogStatus;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
@@ -15,6 +25,8 @@ import org.testng.asserts.SoftAssert;
 public class testCase_02 {
 
     RemoteWebDriver driver;
+    ExtentReports report;
+    ExtentTest test;
     SoftAssert softassert = new SoftAssert();
 
     @BeforeSuite
@@ -22,13 +34,19 @@ public class testCase_02 {
 
         DriverSingleton ds = DriverSingleton.getInstance();
         driver = ds.getDriver();
+        ReportSingleton reportObj = ReportSingleton.getInstance();
+        report = reportObj.getReport();
+        test = report.startTest("Test case 2 ");
+        report.loadConfig(new File(System.getProperty("user.dir")
+                + "/src/test/java/qtriptest/extentReportConfig.xml"));
 
     }
 
-    @Test(dataProvider = "my data provider", dataProviderClass = DP.class, priority = 2, groups = {"Search and Filter flow"})
+    @Test(dataProvider = "my data provider", dataProviderClass = DP.class, priority = 2,
+            groups = {"Search and Filter flow"})
     public void TestCase02(String city, String categoryFilter, String durationFilter,
             String expectedFilterResult, String expectedUnfilterResult)
-            throws InterruptedException {
+            throws InterruptedException, IOException {
 
         // 1. Navigate to the Home page of QTrip
         // 2. Search for a city that's not present
@@ -62,10 +80,28 @@ public class testCase_02 {
         Thread.sleep(3000);
         Assert.assertTrue(adventurePageTest.getResultCount() > 0);
 
+        boolean status = adventurePageTest.getResultCount() > 0;
+        if (status) {
+            test.log(LogStatus.PASS, "Test for searching and filters passed");
+        } else {
+            test.log(LogStatus.FAIL, "Test for searching and filters failed");
+            test.log(LogStatus.FAIL, test.addScreenCapture(capture(driver)) + "Test failed");
+        }
+    }
+
+    public String capture(WebDriver driver) throws IOException {
+        File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        File dest = new File(System.getProperty("user.dir") + "/src/test/java/QtripFailedSS/"
+                + System.currentTimeMillis() + ".png");
+        String errflpath = dest.getAbsolutePath();
+        FileUtils.copyFile(scrFile, dest);
+        return errflpath;
     }
 
     @AfterSuite
     public void tearDown() {
         driver.quit();
+        report.endTest(test);
+        report.flush();
     }
 }
